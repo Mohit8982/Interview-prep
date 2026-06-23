@@ -27,6 +27,7 @@ const PROVIDERS = [
     helpUrl: 'https://aistudio.google.com/app/apikey',
     helpLabel: 'Get a free Gemini API key',
     needsKey: true,
+    keyPrefix: 'AIza',
   },
   {
     id: 'openai',
@@ -35,6 +36,26 @@ const PROVIDERS = [
     helpUrl: 'https://platform.openai.com/api-keys',
     helpLabel: 'Create an OpenAI API key',
     needsKey: true,
+    keyPrefix: 'sk-',
+  },
+  {
+    id: 'emergent-gemini',
+    label: 'Emergent Universal Key · Gemini',
+    badge: 'One key, any model',
+    description: 'Use your own Emergent universal key (sk-emergent-...) — credits deducted from your Emergent balance. Routed via Gemini 2.5 Flash.',
+    helpUrl: 'https://app.emergent.sh',
+    helpLabel: 'Get your Emergent key from Profile → Universal Key',
+    needsKey: true,
+    keyPrefix: 'sk-emergent-',
+  },
+  {
+    id: 'emergent-openai',
+    label: 'Emergent Universal Key · OpenAI',
+    description: 'Use your own Emergent universal key (sk-emergent-...) routed via OpenAI GPT-4o.',
+    helpUrl: 'https://app.emergent.sh',
+    helpLabel: 'Get your Emergent key from Profile → Universal Key',
+    needsKey: true,
+    keyPrefix: 'sk-emergent-',
   },
 ];
 
@@ -221,7 +242,7 @@ export default function InputScreen() {
                   <input
                     className="input-base pr-12"
                     type={showKey ? 'text' : 'password'}
-                    placeholder={provider === 'gemini' ? 'AIza...' : 'sk-...'}
+                    placeholder={providerInfo?.keyPrefix ? `${providerInfo.keyPrefix}...` : 'API key…'}
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     autoComplete="off"
