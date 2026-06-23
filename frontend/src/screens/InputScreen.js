@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -10,12 +10,11 @@ import {
   Lock,
   Cpu,
   ShieldCheck,
-  Cloud,
 } from '@phosphor-icons/react';
 import { toast, Toaster } from 'sonner';
 import StatusPills from '../components/StatusPills';
 import { SS_KEYS, ssSet, clearActiveSession } from '../lib/storage';
-import { inferDifficultyAndQuestions, checkEmergentAvailable } from '../services/aiService';
+import { inferDifficultyAndQuestions } from '../services/aiService';
 
 const INTERVIEW_TYPES = ['HR Round', 'Technical Round', 'System Design', 'Behavioural Round'];
 
@@ -37,19 +36,6 @@ const PROVIDERS = [
     helpLabel: 'Create an OpenAI API key',
     needsKey: true,
   },
-  {
-    id: 'emergent-gemini',
-    label: 'Emergent Universal Key · Gemini',
-    badge: 'No key needed',
-    description: 'Use the Emergent universal LLM key (consumes your Emergent credits).',
-    needsKey: false,
-  },
-  {
-    id: 'emergent-openai',
-    label: 'Emergent Universal Key · OpenAI',
-    description: 'Use the Emergent universal LLM key (consumes your Emergent credits).',
-    needsKey: false,
-  },
 ];
 
 export default function InputScreen() {
@@ -61,12 +47,7 @@ export default function InputScreen() {
   const [provider, setProvider] = useState('gemini');
   const [apiKey, setApiKey] = useState('');
   const [showKey, setShowKey] = useState(false);
-  const [emergentAvailable, setEmergentAvailable] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    checkEmergentAvailable().then(setEmergentAvailable);
-  }, []);
 
   const providerInfo = PROVIDERS.find((p) => p.id === provider);
   const needsKey = providerInfo?.needsKey;
@@ -79,10 +60,6 @@ export default function InputScreen() {
     }
     if (needsKey && !apiKey.trim()) {
       toast.error('Please enter your API key');
-      return;
-    }
-    if (!needsKey && !emergentAvailable) {
-      toast.error('Emergent key is not available on this server.');
       return;
     }
 
@@ -301,16 +278,6 @@ export default function InputScreen() {
               <li className="flex gap-3"><span className="text-primary font-mono">05</span> History saved locally to your browser</li>
             </ol>
           </div>
-
-          {emergentAvailable && (
-            <div className="border border-primary/30 bg-primary/5 rounded-lg p-4 flex items-start gap-3">
-              <Cloud size={18} weight="duotone" className="text-primary mt-0.5" />
-              <div className="text-xs text-foreground/70">
-                <span className="text-foreground font-semibold">Emergent Universal Key available.</span> Select the
-                Emergent provider option to run without your own API key (uses Emergent credits).
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

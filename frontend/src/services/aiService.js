@@ -1,7 +1,5 @@
-// AI service for client-side calls + optional Emergent backend fallback
-// Providers: 'gemini' (client-side @google/genai), 'openai' (client-side fetch), 'emergent' (backend proxy)
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+// AI service for client-side calls only.
+// Providers: 'gemini' (client-side @google/genai), 'openai' (client-side fetch)
 
 function parseJsonFromText(text) {
   if (!text) return null;
@@ -103,41 +101,13 @@ async function callGemini(apiKey, prompt, systemMessage = 'You are a helpful ass
   }
 }
 
-// === Emergent backend proxy ===
-async function callEmergent(providerForEmergent, prompt, systemMessage = 'You are a helpful assistant.') {
-  let res;
-  try {
-    res = await fetch(`${BACKEND_URL}/api/llm/proxy`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        provider: providerForEmergent,
-        prompt,
-        system_message: systemMessage,
-      }),
-    });
-  } catch (e) {
-    throw buildError(0, e.message);
-  }
-  if (!res.ok) {
-    let detail = '';
-    try {
-      const j = await res.json();
-      detail = j?.detail || '';
-    } catch { /* ignore */ }
-    throw buildError(res.status, detail);
-  }
-  const data = await res.json();
-  return data?.text || '';
-}
+// === Emergent backend proxy removed — strictly client-side ===
 
 // === Public API ===
-// provider: 'gemini' | 'openai' | 'emergent-gemini' | 'emergent-openai'
+// provider: 'gemini' | 'openai'
 export async function callAI({ provider, apiKey, prompt, systemMessage }) {
   if (provider === 'gemini') return callGemini(apiKey, prompt, systemMessage);
   if (provider === 'openai') return callOpenAI(apiKey, prompt, systemMessage);
-  if (provider === 'emergent-gemini') return callEmergent('gemini', prompt, systemMessage);
-  if (provider === 'emergent-openai') return callEmergent('openai', prompt, systemMessage);
   throw new Error(`Unknown provider: ${provider}`);
 }
 
@@ -242,15 +212,4 @@ Return ONLY valid JSON:
     return { perQuestion: [] };
   }
   return parsed;
-}
-
-export async function checkEmergentAvailable() {
-  try {
-    const r = await fetch(`${BACKEND_URL}/api/health`);
-    if (!r.ok) return false;
-    const j = await r.json();
-    return !!j.emergent_available;
-  } catch {
-    return false;
-  }
 }
