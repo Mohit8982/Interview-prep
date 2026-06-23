@@ -61,6 +61,37 @@ let webpackConfig = {
 };
 
 webpackConfig.devServer = (devServerConfig) => {
+  // Translate deprecated v4 schema (onBefore/AfterSetupMiddleware) to v5 setupMiddlewares
+  const beforeFn = devServerConfig.onBeforeSetupMiddleware;
+  const afterFn = devServerConfig.onAfterSetupMiddleware;
+  if (beforeFn || afterFn) {
+    const userSetup = devServerConfig.setupMiddlewares;
+    devServerConfig.setupMiddlewares = (middlewares, devServer) => {
+      if (beforeFn) beforeFn(devServer);
+      const result = userSetup ? userSetup(middlewares, devServer) : middlewares;
+      if (afterFn) afterFn(devServer);
+      return result;
+    };
+    delete devServerConfig.onBeforeSetupMiddleware;
+    delete devServerConfig.onAfterSetupMiddleware;
+  }
+
+  // Translate v4 `https`/`http2` to v5 `server`
+  if (devServerConfig.https !== undefined) {
+    if (devServerConfig.https && typeof devServerConfig.https === 'object') {
+      devServerConfig.server = { type: 'https', options: devServerConfig.https };
+    } else if (devServerConfig.https === true) {
+      devServerConfig.server = { type: 'https' };
+    } else {
+      devServerConfig.server = { type: 'http' };
+    }
+    delete devServerConfig.https;
+  }
+
+  // Translate v4 `static.watch` -> v5 (still supported but ensure compat)
+  // Drop other deprecated v4-only keys that v5 schema rejects
+  ['onListening'].forEach(() => {}); // onListening still valid in v5
+
   // Add health check endpoints if enabled
   if (config.enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
     const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
