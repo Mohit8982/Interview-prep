@@ -71,6 +71,7 @@ export default function InterviewScreen() {
       setMessages([{ role: 'assistant', content: opening, timestamp: new Date().toISOString() }]);
       if (voiceOn) speak(opening, true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interviewData]);
 
   const totalQuestions = interviewData?.questions?.length || 0;
