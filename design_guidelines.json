@@ -1,0 +1,87 @@
+{
+  "theme_archetype": {
+    "name": "Resume Intelligence Premium Theme",
+    "type": "Archetype 4 (Swiss/High-Contrast) with Amber Tech Accents",
+    "mode": "dark-only"
+  },
+  "colors": {
+    "background": "hsl(222.2, 84%, 4.9%)",
+    "foreground": "hsl(210, 40%, 98%)",
+    "primary": "hsl(38, 92%, 50%)",
+    "success": "hsl(142, 76%, 36%)",
+    "error": "hsl(0, 72%, 51%)",
+    "muted_border": "hsl(217.2, 32.6%, 17.5%)",
+    "rules": [
+      "Amber (#F59E0B) is used ONLY for primary actions, active states, and critical accents. Limit usage to maintain impact.",
+      "Background uses a subtle grid pattern.",
+      "Never use pure black or pure white; always use the provided tinted neutrals."
+    ]
+  },
+  "typography": {
+    "fonts": {
+      "headings": "Inter, system-ui, sans-serif",
+      "body": "Inter, system-ui, sans-serif",
+      "mono": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+    },
+    "hierarchy": {
+      "H1": "text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter leading-none",
+      "H2": "text-lg font-semibold tracking-tight",
+      "body": "text-base md:text-sm leading-relaxed",
+      "micro_labels": "text-[9px] uppercase tracking-[0.2em] font-mono text-foreground/50"
+    }
+  },
+  "layout": {
+    "general": [
+      "NO bouncy animations. NO centered layouts.",
+      "Asymmetric grid layouts. Professional analyst aesthetic.",
+      "Padding scale should be generous: p-6, p-8, p-12."
+    ],
+    "background": {
+      "grid": "Use CSS background: radial-gradient(circle at 1px 1px, hsl(217.2 32.6% 17.5%) 1px, transparent 0); background-size: 24px 24px;",
+      "ambient_blobs": "Absolute positioned divs with heavy blur (e.g. blur-[120px]), low opacity (10-15%), slow keyframe rotation. Colors: Amber and Muted Blue."
+    },
+    "screens": {
+      "input": "Asymmetric form layout. Form on left (col-span-8), stats/info grid on right (col-span-4).",
+      "interview": "Split-view layout. Left: Live feedback panel (30-40% width). Right: Chat interface (60-70% width) with fixed bottom input area.",
+      "results": "Bento grid layout for overall score and breakdown.",
+      "history": "Dense, analytical card grid for past interviews."
+    }
+  },
+  "components": {
+    "status_pill": "Top fixed pill: border border-muted_border bg-background/50 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-mono tracking-widest text-foreground/70 uppercase. Text: AI-POWERED · CLIENT-SIDE | 100% PRIVATE · NO SERVER",
+    "buttons": {
+      "primary": "bg-primary text-background font-semibold px-4 py-2 rounded-md hover:bg-primary/90 transition-colors shadow-[0_0_15px_rgba(245,158,11,0.3)]",
+      "secondary": "bg-background border border-muted_border text-foreground hover:bg-muted_border/50 transition-colors",
+      "danger": "bg-error/10 text-error hover:bg-error/20 transition-colors rounded-md px-4 py-2"
+    },
+    "chat": {
+      "user_bubble": "bg-muted_border/40 border border-muted_border/50 rounded-2xl rounded-tr-sm p-4 text-sm max-w-[85%] self-end",
+      "ai_bubble": "bg-transparent border-l-2 border-primary pl-4 py-2 text-sm text-foreground/90 max-w-[90%] self-start"
+    },
+    "feedback_panel": {
+      "card": "bg-background/80 backdrop-blur border border-muted_border p-4 rounded-lg flex flex-col gap-2",
+      "score": "font-mono text-2xl font-bold text-primary"
+    },
+    "inputs": {
+      "base": "bg-background border border-muted_border rounded-md px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-foreground/30",
+      "textarea": "min-h-[120px] resize-y"
+    }
+  },
+  "motion": {
+    "rules": [
+      "NO bouncy animations (e.g., stiffness: 100, damping: 10).",
+      "Use smooth, linear or ease-out transitions. (ease: [0.16, 1, 0.3, 1])",
+      "Ambient blobs should move imperceptibly slow (10-20s duration)."
+    ]
+  },
+  "icons_and_assets": {
+    "library": "@phosphor-icons/react",
+    "weight": "regular (use duotone for accents)",
+    "usage": "Use Phosphor icons for AI chat avatar, voice recording button, and feedback metrics."
+  },
+  "testing_and_rules": {
+    "data_testid": "ALL interactive and key informational elements MUST include data-testid attribute in kebab-case.",
+    "client_side": "100% client-side. Storage in sessionStorage (active) and localStorage (history). Direct API calls using fetch or @google/genai.",
+    "framework": "React 18+ with Tailwind CSS."
+  }
+}
