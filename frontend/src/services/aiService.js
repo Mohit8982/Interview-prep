@@ -1,5 +1,8 @@
 // AI service for client-side calls only.
-// Providers: 'gemini' (client-side @google/genai), 'openai' (client-side fetch)
+// Providers: 'gemini' (client-side @google/genai), 'openai' (client-side fetch),
+// 'emergent-gemini' / 'emergent-openai' (user's own sk-emergent-... key via tiny backend proxy)
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 
 function parseJsonFromText(text) {
   if (!text) return null;
@@ -29,6 +32,7 @@ function parseJsonFromText(text) {
 
 function buildError(status, providerMsg) {
   if (status === 401 || status === 403) return new Error('Invalid API key');
+  if (status === 402) return new Error(providerMsg || 'Budget exceeded — top up your key');
   if (status === 429) return new Error('Rate limit exceeded');
   if (!status) return new Error('Connection failed, check your internet');
   return new Error(providerMsg || `Request failed (${status})`);
@@ -101,13 +105,42 @@ async function callGemini(apiKey, prompt, systemMessage = 'You are a helpful ass
   }
 }
 
-// === Emergent backend proxy removed — strictly client-side ===
+// === Emergent universal key (proxied via tiny backend) ===
+async function callEmergent(apiKey, modelChoice, prompt, systemMessage = 'You are a helpful assistant.') {
+  if (!BACKEND_URL) {
+    throw new Error('Backend URL not configured. The Emergent option requires the backend to be reachable.');
+  }
+  let res;
+  try {
+    res = await fetch(`${BACKEND_URL}/api/llm/emergent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        api_key: apiKey.trim(),
+        model_choice: modelChoice,
+        prompt,
+        system_message: systemMessage,
+      }),
+    });
+  } catch (e) {
+    throw buildError(0, e.message);
+  }
+  if (!res.ok) {
+    let detail = '';
+    try { const j = await res.json(); detail = j?.detail || ''; } catch { /* ignore */ }
+    throw buildError(res.status, detail);
+  }
+  const data = await res.json();
+  return data?.text || '';
+}
 
 // === Public API ===
-// provider: 'gemini' | 'openai'
+// provider: 'gemini' | 'openai' | 'emergent-gemini' | 'emergent-openai'
 export async function callAI({ provider, apiKey, prompt, systemMessage }) {
   if (provider === 'gemini') return callGemini(apiKey, prompt, systemMessage);
   if (provider === 'openai') return callOpenAI(apiKey, prompt, systemMessage);
+  if (provider === 'emergent-gemini') return callEmergent(apiKey, 'gemini', prompt, systemMessage);
+  if (provider === 'emergent-openai') return callEmergent(apiKey, 'openai', prompt, systemMessage);
   throw new Error(`Unknown provider: ${provider}`);
 }
 
